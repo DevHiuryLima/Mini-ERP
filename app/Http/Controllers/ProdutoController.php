@@ -49,13 +49,13 @@ class ProdutoController extends Controller
     public function show(string $id)
     {
         $produto->load('estoques');
-        return view('produtos.show', compact('produto'));
+        return view('produtos.edit', compact('produto'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Produto $produto)
     {
         $produto->load('estoques');
         return view('produtos.edit', compact('produto'));
@@ -64,42 +64,32 @@ class ProdutoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProdutoRequest $request, string $id)
-    {
-        DB::transaction(function() use ($request, $produto) {
-            $produto->update($request->only(['nome', 'preco']));
+        public function update(UpdateProdutoRequest $request, Produto $produto)
+        {
+            DB::transaction(function() use ($request, $produto) {
+                $produto->update($request->only(['nome', 'preco']));
 
-            if ($request->has('estoques')) {
-                $estoques = collect($request->input('estoques'));
+                $processedIds = [];
 
-                $estoques->each(function ($item) use ($produto) {
-                    if (!empty($item['id'])) {
-                        Estoque::where('id', $item['id'])
-                            ->update([
-                                'variacao'   => $item['variacao'] ?? null,
-                                'quantidade' => $item['quantidade'],
-                            ]);
-                    } else {
-                        $produto->estoques()->create($item);
-                    }
-                });
+                foreach ($request->input('estoques', []) as $item) {
+                    $estoque = $produto->estoques()->updateOrCreate(
+                        ['variacao'   => $item['variacao'] ?? null],
+                        ['quantidade' => $item['quantidade']]
+                    );
 
-                $idsEnviados = $estoques->pluck('id')->filter();
-                $produto->estoques()
-                       ->whereNotIn('id', $idsEnviados)
-                       ->delete();
-            }
-        });
+                    $processedIds[] = $estoque->id;
+                }
+            });
 
-        return redirect()
-            ->route('produtos.index')
-            ->with('success', 'Produto atualizado com sucesso!');
-    }
+            return redirect()
+                ->route('produtos.index')
+                ->with('success', 'Produto atualizado com sucesso!');
+        }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Produto $produto)
     {
         $produto->delete();
 
