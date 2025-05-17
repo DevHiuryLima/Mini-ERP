@@ -38,5 +38,7 @@
     </tbody>
 </table>
 
-{{ $produtos->links() }}
+<div class="d-flex justify-content-center my-4">
+    {{ $produtos->links('pagination::bootstrap-5') }}
+</div>
 @endsection
