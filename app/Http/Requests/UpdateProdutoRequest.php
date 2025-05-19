@@ -24,9 +24,9 @@ class UpdateProdutoRequest extends FormRequest
         return [
             'nome' => 'required|string|max:255',
             'preco' => 'required|numeric|min:0.01',
-            'estoques' => 'required|array',
+            'estoques' => 'required|array|min:1',
             'estoques.*.variacao' => 'nullable|string|max:255',
-            'estoques.*.quantidade' => 'required|integer|min:0',
+            'estoques.*.quantidade' => 'required|integer|min:1',
         ];
     }
 }
