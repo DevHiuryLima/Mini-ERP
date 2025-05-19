@@ -14,8 +14,8 @@
             min="0"
             value="{{ old("estoques.$index.quantidade", $item['quantidade'] ?? 1) }}"
             required>
-        </div>
+    </div>
     <div class="col-md-2 d-flex align-items-end">
-        <button type="button" class="btn btn-outline-danger remove-estoque w-100">×</button>
+        <button type="button" class="btn btn-outline-danger remove-estoque w-100" data-id="{{ $item['id'] ?? '' }}">×</button>
     </div>
 </div>

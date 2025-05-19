@@ -1,9 +1,12 @@
 @extends('layouts.app')
 @section('title', 'Editar Produto')
+@push('head')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+@endpush
 
 @section('content')
 <div class="d-flex justify-content-between mb-3">
-    <h1>Cadastrar Novo Produto</h1>
+    <h1>Editar Produto</h1>
     <a href="{{ route('produtos.index') }}" class="btn btn-primary d-flex align-items-center">Voltar</a>
 </div>
 
@@ -29,17 +32,17 @@
         <label for="preco" class="form-label">Preço</label>
         <input type="number" step="0.01" class="form-control" id="preco" name="preco" value="{{ $produto->preco }}" required>
     </div>
-    
+
     <h2>Estoque</h2>
     <div id="estoques-container">
     @foreach($produto->estoques as $i => $item)
         @include('produtos._estoque_fields', [
         'index' => $i,
-        'item'  => ['variacao' => $item->variacao, 'quantidade' => $item->quantidade]
+        'item'  => ['id' => $item->id, 'variacao' => $item->variacao, 'quantidade' => $item->quantidade]
         ])
     @endforeach
     </div>
-    
+
     <div class="m-0 p-0 d-flex align-items-center">
         <button type="button" id="add-estoque" class="btn btn-outline-secondary m-1 mb-4">+ Adicionar variação</button>
         <button type="submit" class="btn btn-success m-1 mb-4">Salvar Produto</button>
@@ -53,7 +56,7 @@ $(function() {
     let index = $container.children().length;
 
     // pré-carrega o template já sem quebras de linha
-    const template = `{!! str_replace(["\r", "\n"], '', 
+    const template = `{!! str_replace(["\r", "\n"], '',
         view('produtos._estoque_fields', ['index' => '__INDEX__', 'item' => []])->render()
     ) !!}`;
 
@@ -66,7 +69,27 @@ $(function() {
 
     // remover variação existente (delegation)
     $container.on('click', '.remove-estoque', function() {
-        $(this).closest('.estoque-item').remove();
+        const $btn = $(this);
+        const estoqueId = $btn.data('id');
+
+        if (!estoqueId) {
+            $btn.closest('.estoque-item').remove();
+            return;
+        }
+
+        if (!confirm('Tem certeza que deseja remover esta variação de estoque?')) return;
+
+        $.ajax({
+            url: `/estoques/${estoqueId}`,
+            type: 'DELETE',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: function (res) {
+                $btn.closest('.estoque-item').remove();
+            },
+            error: function () {
+                alert('Erro na comunicação com o servidor.');
+            }
+        });
     });
 });
 </script>

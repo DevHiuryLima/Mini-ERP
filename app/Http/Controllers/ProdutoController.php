@@ -63,23 +63,23 @@ class ProdutoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-        public function update(UpdateProdutoRequest $request, Produto $produto)
-        {
-            DB::transaction(function() use ($request, $produto) {
-                $produto->update($request->only(['nome', 'preco']));
+    public function update(UpdateProdutoRequest $request, Produto $produto)
+    {
+        DB::transaction(function() use ($request, $produto) {
+            $produto->update($request->only(['nome', 'preco']));
 
-                foreach ($request->input('estoques', []) as $item) {
-                    $estoque = $produto->estoques()->updateOrCreate(
-                        ['variacao'   => $item['variacao'] ?? null],
-                        ['quantidade' => $item['quantidade']]
-                    );
-                }
-            });
+            foreach ($request->input('estoques', []) as $item) {
+                $estoque = $produto->estoques()->updateOrCreate(
+                    ['variacao'   => $item['variacao'] ?? null],
+                    ['quantidade' => $item['quantidade']]
+                );
+            }
+        });
 
-            return redirect()
-                ->route('produtos.index')
-                ->with('success', 'Produto atualizado com sucesso!');
-        }
+        return redirect()
+            ->route('produtos.index')
+            ->with('success', 'Produto atualizado com sucesso!');
+    }
 
     /**
      * Remove the specified resource from storage.
