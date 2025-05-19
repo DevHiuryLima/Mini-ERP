@@ -11,15 +11,16 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-secondary mb-4">
             <div class="container d-flex justify-content-space-between align-items-center">
                 <a class="navbar-brand" href="{{ route('produtos.index') }}">Mini ERP</a>
-                
+
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a href="#" class="nav-link">Pedido</a></li>
                     <li class="nav-item"><a href="{{ route('produtos.index') }}" class="nav-link">Produtos</a></li>
+                    <li class="nav-item"><a href="{{ route('carrinho.index') }}" class="nav-link">Carrinho</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">Pedidos</a></li>
                 </ul>
             </div>
         </nav>
     </header>
-    
+
     <main class="container">
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
