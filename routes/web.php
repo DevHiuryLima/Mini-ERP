@@ -4,9 +4,9 @@ use App\Http\Controllers\CarrinhoController;
 use App\Http\Controllers\ProdutoController;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/', function () {
+    return redirect()->route('produtos.index');
+});
 
 Route::resource('produtos', ProdutoController::class);
 Route::get('/carrinho', [CarrinhoController::class, 'index'])->name('carrinho.index');
