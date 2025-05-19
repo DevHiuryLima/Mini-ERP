@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CarrinhoController;
 use App\Http\Controllers\ProdutoController;
 use Illuminate\Support\Facades\Route;
 
@@ -8,3 +9,6 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::resource('produtos', ProdutoController::class);
+Route::get('/carrinho', [CarrinhoController::class, 'index'])->name('carrinho.index');
+Route::post('/carrinho/adicionar', [CarrinhoController::class, 'adicionar'])->name('carrinho.adicionar');
+Route::delete('/carrinho/remover', [CarrinhoController::class, 'remover'])->name('carrinho.remover');
