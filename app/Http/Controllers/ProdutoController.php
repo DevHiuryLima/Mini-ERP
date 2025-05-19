@@ -46,7 +46,7 @@ class ProdutoController extends Controller
     /**
      * Display the specified resource.
      */
-        public function show(string $id)
+    public function show(string $id)
     {
         //
     }
@@ -68,15 +68,11 @@ class ProdutoController extends Controller
             DB::transaction(function() use ($request, $produto) {
                 $produto->update($request->only(['nome', 'preco']));
 
-                $processedIds = [];
-
                 foreach ($request->input('estoques', []) as $item) {
                     $estoque = $produto->estoques()->updateOrCreate(
                         ['variacao'   => $item['variacao'] ?? null],
                         ['quantidade' => $item['quantidade']]
                     );
-
-                    $processedIds[] = $estoque->id;
                 }
             });
 
