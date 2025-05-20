@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CarrinhoController;
+use App\Http\Controllers\CupomController;
 use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\ProdutoController;
 use Illuminate\Support\Facades\Route;
@@ -11,6 +12,7 @@ Route::get('/', function () {
 
 Route::resource('produtos', ProdutoController::class);
 Route::delete('estoques/{estoque}', [EstoqueController::class, 'destroy'])->name('estoques.destroy');
+Route::resource('cupons', CupomController::class);
 
 Route::get('/carrinho', [CarrinhoController::class, 'index'])->name('carrinho.index');
 Route::post('/carrinho/adicionar', [CarrinhoController::class, 'adicionar'])->name('carrinho.adicionar');
