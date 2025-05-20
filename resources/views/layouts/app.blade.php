@@ -15,6 +15,7 @@
 
                 <ul class="navbar-nav">
                     <li class="nav-item"><a href="{{ route('produtos.index') }}" class="nav-link">Produtos</a></li>
+                    <li class="nav-item"><a href="{{ route('cupons.index') }}" class="nav-link">Cupons</a></li>
                     <li class="nav-item"><a href="{{ route('carrinho.index') }}" class="nav-link">Carrinho</a></li>
                     <li class="nav-item"><a href="#" class="nav-link">Pedidos</a></li>
                 </ul>

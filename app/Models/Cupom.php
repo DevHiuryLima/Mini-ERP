@@ -10,6 +10,8 @@ class Cupom extends Model
 {
     use HasFactory;
 
+    protected $table = 'cupons';
+
     protected $fillable = [
         'codigo',
         'tipo_desconto',
@@ -17,6 +19,12 @@ class Cupom extends Model
         'minimo_subtotal',
         'validade',
         'ativo',
+    ];
+
+    /** @var array<string,string> */
+    protected $casts = [
+        'validade' => 'date',
+        'ativo'    => 'boolean',
     ];
 
     public function pedidos(): HasMany
