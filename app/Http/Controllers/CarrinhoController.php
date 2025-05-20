@@ -109,6 +109,16 @@ class CarrinhoController extends Controller
             return $soma + ($item['preco'] * $item['quantidade']);
         }, 0);
 
+        $desconto = 0;
+        if (isset($carrinho['cupom']['desconto'])) {
+            // garante que seja float
+            $desconto = is_string($carrinho['cupom']['desconto'])
+                ? floatval(str_replace(',', '.', $carrinho['cupom']['desconto']))
+                : (float) $carrinho['cupom']['desconto'];
+        }
+
+        $subtotal -= $desconto;
+
         if ($subtotal >= 52 && $subtotal <= 166.59) {
             $frete = 15.00;
             $mensagem = 'Frete de R$ 15,00 para subtotal entre R$ 52,00 e R$ 166,59.';

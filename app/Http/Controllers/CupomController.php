@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCupomRequest;
 use App\Http\Requests\UpdateCupomRequest;
 use App\Models\Cupom;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class CupomController extends Controller
 {
@@ -84,17 +85,18 @@ class CupomController extends Controller
             'codigo' => ['required','string','exists:cupons,codigo'],
         ]);
 
-        $cupom = Cupom::where('codigo', $request->codigo)
-            ->where('ativo', true)
-            ->whereDate('validade', '>=', now())
-            ->firstOrFail();
+        $cupom = Cupom::where('codigo', $request->codigo)->where('ativo', true)->whereDate('validade', '>=', now())->firstOrFail();
 
-        $subtotal = session('carrinho.subtotal', 0);
+        $carrinho = Session::get('carrinho', []);
+
+        $subtotal = array_reduce($carrinho['produtos'], function($soma, $item) {
+            return $soma + ($item['preco'] * $item['quantidade']);
+        }, 0);
 
         if ($subtotal < $cupom->minimo_subtotal) {
-            return back()->withErrors([
-                'cupom' => "Requer subtotal mínimo de R$ ".number_format($cupom->minimo_subtotal,2,',','.'),
-            ]);
+            return response()->json([
+                'errors' => 'Requer subtotal mínimo de R$ ' . number_format($cupom->minimo_subtotal,2,',','.'),
+            ], 400);
         }
 
         // Calcula desconto
@@ -104,14 +106,36 @@ class CupomController extends Controller
             $desconto = $cupom->valor;
         }
 
+        $rawTotal = session('carrinho.total', $subtotal);
+
+        if (is_string($rawTotal)) {
+            $numericTotal = floatval(str_replace(',', '.', $rawTotal));
+        } else {
+            $numericTotal = (float) $rawTotal;
+        }
+
+        $total = max(0, $numericTotal - $desconto);
+
+        $rawFrete = session('carrinho.frete', 0);
+        if ($rawFrete) {
+            $freteNumeric = is_string($rawFrete)
+                ? floatval(str_replace(',', '.', $rawFrete))
+                : (float) $rawFrete;
+
+            $total += $freteNumeric;
+        }
+
         // Atualiza sessão
         session([
-            'carrinho.cupom'       => $cupom->codigo,
-            'carrinho.desconto'    => round($desconto,2),
-            'carrinho.total'       => max(0, session('carrinho.total', $subtotal) - $desconto),
+            'carrinho.cupom.codigo' => $cupom->codigo,
+            'carrinho.cupom.desconto' => round($desconto,2),
+            'carrinho.total' => number_format($total, 2, ',', '.'),
         ]);
 
-        return back()->with('success', 'Cupom aplicado: '. $cupom->codigo);
+        return response()->json([
+            'desconto' => number_format($desconto, 2, ',', '.'),
+            'total' => number_format($total, 2, ',', '.'),
+            'mensagem' => 'Cupom aplicado'. $cupom->codigo,
+        ]);
     }
-
 }

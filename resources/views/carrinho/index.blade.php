@@ -60,10 +60,23 @@
                     @endforeach
                     {{ number_format($totalCarrinho, 2, ',', '.') }}
                 </p>
-                <p><strong>Frete:</strong> <span id="valorFrete">R$ {{ $carrinho['frete'] }}</span></p>
-                <p><strong>Cupom:</strong> <span id="descontoCupom" class="text-success">-</span></p>
+                <p><strong>Cupom:</strong>
+                    <span id="valorDesconto" class="text-success">- R$ {{ number_format($carrinho['cupom']['desconto'] ?? 0, 2, ',', '.') }}</span>
+                </p>
+                <p><strong>Frete:</strong> <span id="valorFrete">R$ {{ $carrinho['frete'] ?? '' }}</span></p>
                 <hr>
-                <p><strong>Total:</strong> <span id="valorTotal">R$ {{ $carrinho['total'] }}</span></p>
+                <p><strong>Total:</strong> <span id="valorTotal">R$ {{ $carrinho['total'] ?? '' }}</span></p>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header"><h5>Aplicar cupom</h5></div>
+            <div class="card-body">
+                <form id="formCupom" class="d-flex g-2" action="{{ route('cupom.aplicar') }}" method="POST">
+                    @csrf
+                    <input type="text" name="codigo" id="codigo" class="form-control me-2" placeholder="" value="{{ $carrinho['cupom']['codigo'] ?? '' }}" required>
+                    <button class="btn btn-outline-primary">Aplicar</button>
+                </form>
             </div>
         </div>
 
@@ -72,27 +85,16 @@
             <div class="card-body">
                 <form id="formFrete" class="d-flex g-2" action="{{ route('carrinho.frete') }}" method="POST">
                     @csrf
-                    <input type="text" name="cep" id="cep" class="form-control cep me-2" placeholder="Digite seu CEP" value="{{ $carrinho['endereco']['cep'] }}" required>
+                    <input type="text" name="cep" id="cep" class="form-control cep me-2" placeholder="Digite seu CEP" value="{{ $carrinho['endereco']['cep'] ?? '' }}" required>
                     <button class="btn btn-outline-primary">Calcular</button>
                 </form>
 
                 <div id="enderecoResultado" class="mt-3 {{ empty($carrinho['endereco'] ?? null) ? 'd-none' : '' }}">
-                    <p class="mb-1"><strong>Estado:</strong> <span id="uf">{{ $carrinho['endereco']['uf'] }}</span></p>
-                    <p class="mb-1"><strong>Ciade:</strong> <span id="localidade">{{ $carrinho['endereco']['localidade'] }}</span></p>
-                    <p class="mb-1"><strong>Bairro:</strong> <span id="bairro">{{ $carrinho['endereco']['bairro'] }}</span></p>
-                    <p class="mb-1"><strong>Logradouro:</strong> <span id="logradouro">{{ $carrinho['endereco']['logradouro'] }}</span></p>
+                    <p class="mb-1"><strong>Estado:</strong> <span id="uf">{{ $carrinho['endereco']['uf'] ?? '' }}</span></p>
+                    <p class="mb-1"><strong>Ciade:</strong> <span id="localidade">{{ $carrinho['endereco']['localidade'] ?? '' }}</span></p>
+                    <p class="mb-1"><strong>Bairro:</strong> <span id="bairro">{{ $carrinho['endereco']['bairro'] ?? '' }}</span></p>
+                    <p class="mb-1"><strong>Logradouro:</strong> <span id="logradouro">{{ $carrinho['endereco']['logradouro'] ?? '' }}</span></p>
                 </div>
-            </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-header"><h5>Aplicar cupom</h5></div>
-            <div class="card-body">
-                <form id="formCupom" class="d-flex g-2" action="" method="POST">
-                    @csrf
-                    <input type="text" name="cep" id="cep" class="form-control cep me-2" placeholder="" required>
-                    <button class="btn btn-outline-primary">Aplicar</button>
-                </form>
             </div>
         </div>
 
@@ -120,7 +122,6 @@ $(document).ready(function() {
             success: function(response) {
                 $('#valorFrete').text(`R$ ${response.frete}`);
                 $('#valorTotal').text(`R$ ${response.total}`);
-                $('#valorTotal').text(`R$ ${response.total}`);
                 $('#logradouro').text(response.endereco.logradouro);
                 $('#bairro').text(response.endereco.bairro);
                 $('#localidade').text(response.endereco.localidade);
@@ -128,6 +129,29 @@ $(document).ready(function() {
                 $('#enderecoResultado').removeClass('d-none');
             },
             error: function(xhr) {
+                window.alert(xhr.responseJSON.errors);
+            }
+        });
+    });
+
+    $('#formCupom').on('submit', function(e) {
+        e.preventDefault();
+        let json = {
+            'codigo': $(this).find('#codigo').val(),
+            '_token': $(this).find('input[name="_token"]').val(),
+        }
+
+        $.ajax({
+            url: $(this).attr('action'),
+            method: $(this).attr('method'),
+            data: json,
+            success: function(response) {
+                $('#valorTotal').text(`R$ ${response.total}`);
+                $('#valorDesconto').text(`- R$ ${response.desconto}`);
+                window.alert(response.mensagem)
+            },
+            error: function(xhr) {
+                console.log(xhr)
                 window.alert(xhr.responseJSON.errors);
             }
         });

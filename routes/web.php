@@ -13,6 +13,7 @@ Route::get('/', function () {
 Route::resource('produtos', ProdutoController::class);
 Route::delete('estoques/{estoque}', [EstoqueController::class, 'destroy'])->name('estoques.destroy');
 Route::resource('cupons', CupomController::class)->parameters(['cupons' => 'cupom']);
+Route::post('cupons/aplicar', [CupomController::class, 'aplicarCupom'])->name('cupom.aplicar');
 
 Route::get('/carrinho', [CarrinhoController::class, 'index'])->name('carrinho.index');
 Route::post('/carrinho/adicionar', [CarrinhoController::class, 'adicionar'])->name('carrinho.adicionar');
