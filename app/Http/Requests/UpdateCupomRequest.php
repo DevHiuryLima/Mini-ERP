@@ -6,6 +6,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCupomRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'ativo' => $this->has('ativo'),
+        ]);
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -28,7 +35,7 @@ class UpdateCupomRequest extends FormRequest
             'valor'          => 'required|numeric|min:0.01',
             'minimo_subtotal'=> 'required|numeric|min:0',
             'validade'       => 'required|date|after_or_equal:today',
-            'ativo'          => 'sometimes|boolean',
+            'ativo'          => 'boolean',
         ];
     }
 }
