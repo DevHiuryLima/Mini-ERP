@@ -7,7 +7,7 @@
     <a href="{{ route('produtos.create') }}" class="btn btn-success d-flex align-items-center">Novo Produto</a>
 </div>
 
-<table class="table table-bordered">
+<table class="table table-bordered table-striped">
     <thead>
     <tr>
         <th>Nome</th>
