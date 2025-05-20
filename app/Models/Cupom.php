@@ -10,6 +10,8 @@ class Cupom extends Model
 {
     use HasFactory;
 
+    protected $table = 'cupons';
+
     protected $fillable = [
         'codigo',
         'tipo_desconto',
