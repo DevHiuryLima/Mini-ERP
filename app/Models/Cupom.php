@@ -21,6 +21,12 @@ class Cupom extends Model
         'ativo',
     ];
 
+    /** @var array<string,string> */
+    protected $casts = [
+        'validade' => 'date',
+        'ativo'    => 'boolean',
+    ];
+
     public function pedidos(): HasMany
     {
         return $this->hasMany(Pedido::class);
