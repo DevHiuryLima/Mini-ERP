@@ -30,7 +30,7 @@ class Pedido extends Model
 
     public function itens(): HasMany
     {
-        return $this->hasMany(PedidoItem::class);
+        return $this->hasMany(ItemPedido::class);
     }
 
     public function cupom(): BelongsTo
