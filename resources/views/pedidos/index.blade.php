@@ -16,6 +16,7 @@
         <th>Total</th>
         <th>Endereço</th>
         <th>Itens</th>
+        <th>Status</th>
     </tr>
     </thead>
     <tbody>
@@ -53,6 +54,32 @@
                 @else
                     Nenhum item neste pedido.
                 @endif
+            </td>
+            <td>
+                @php
+                    $statusClass = '';
+                    switch ($pedido->status) {
+                        case 'pendente':
+                            $statusClass = 'bg-warning';
+                            break;
+                        case 'processando':
+                            $statusClass = 'bg-info';
+                            break;
+                        case 'enviado':
+                            $statusClass = 'bg-primary';
+                            break;
+                        case 'entregue':
+                            $statusClass = 'bg-success';
+                            break;
+                        case 'cancelado':
+                            $statusClass = 'bg-danger';
+                            break;
+                        default:
+                            $statusClass = 'bg-secondary';
+                            break;
+                    }
+                    @endphp
+                <span class="badge {{ $statusClass }}">{{ ucfirst($pedido->status) }}</span>
             </td>
         </tr>
     @endforeach
