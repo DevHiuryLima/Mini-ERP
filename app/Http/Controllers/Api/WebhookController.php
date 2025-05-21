@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PedidoStatusAtualizado;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class WebhookController extends Controller
 {
@@ -21,11 +23,15 @@ class WebhookController extends Controller
 
         if ($status === 'cancelado') {
             $pedido->delete();
-            return response()->json(['message' => "Pedido {$pedidoId} cancelado com sucesso."], 200);
+            $mensagem = "Pedido {$pedidoId} cancelado com sucesso.";
         } else {
             $pedido->status = $status;
             $pedido->save();
-            return response()->json(['message' => "Status do pedido {$pedidoId} atualizado para {$status}."], 200);
+            $mensagem = "Status do pedido {$pedidoId} atualizado para {$status}.";
+            Mail::to($pedido->email_cliente)->send(new PedidoStatusAtualizado($pedido, $status));
+            $enviouEmail = true;
         }
+
+        return response()->json(['message' => $mensagem, 'email_enviado' => $enviouEmail], 200);
     }
 }
