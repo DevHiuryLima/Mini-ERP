@@ -127,6 +127,7 @@ class CupomController extends Controller
 
         // Atualiza sessão
         session([
+            'carrinho.cupom.id' => $cupom->id,
             'carrinho.cupom.codigo' => $cupom->codigo,
             'carrinho.cupom.desconto' => round($desconto,2),
             'carrinho.total' => number_format($total, 2, ',', '.'),
