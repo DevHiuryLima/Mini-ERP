@@ -98,7 +98,16 @@
             </div>
         </div>
 
-        <a href="#" class="btn btn-success w-100">Finalizar Pedido</a>
+        <div class="card mb-3">
+            <div class="card-header"><h5>Finalizar Pedido</h5></div>
+            <div class="card-body">
+                <form id="formFinalizar" class="g-2" action="{{ route('pedidos.finalizar') }}" method="POST">
+                    @csrf
+                    <input type="email" name="email" id="email" class="form-control m-2" placeholder="E-mail" required>
+                    <button type="submit" class="btn btn-success w-100">Finalizar</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 @endif
@@ -151,8 +160,45 @@ $(document).ready(function() {
                 window.alert(response.mensagem)
             },
             error: function(xhr) {
-                console.log(xhr)
                 window.alert(xhr.responseJSON.errors);
+            }
+        });
+    });
+
+    $('#formFinalizar').on('submit', function(e) {
+        e.preventDefault();
+        let json = {
+            'email': $(this).find('#email').val(),
+            '_token': $(this).find('input[name="_token"]').val(),
+        }
+
+        $.ajax({
+            url: $(this).attr('action'),
+            method: $(this).attr('method'),
+            data: json,
+            success: function(response) {
+                window.location.href = '/pedidos/';
+            },
+            error: function(xhr) {
+                let errors = xhr.responseJSON?.errors;
+                let errorMessage = 'Ocorreu um erro ao finalizar o pedido.';
+
+                if (errors) {
+                    // Se houver erros de validação ou outros erros específicos
+                    let errorMessages = [];
+                    for (const key in errors) {
+                        if (Array.isArray(errors[key])) {
+                            errorMessages = errorMessages.concat(errors[key]);
+                        } else {
+                            errorMessages.push(errors[key]);
+                        }
+                    }
+                    errorMessage = errorMessages.join('\n');
+                } else if (xhr.responseJSON?.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+
+                alert(errorMessage);
             }
         });
     });
