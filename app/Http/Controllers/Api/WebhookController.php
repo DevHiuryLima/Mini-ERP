@@ -12,6 +12,10 @@ class WebhookController extends Controller
 {
     public function handle(Request $request)
     {
+        if ($request->header('X-Webhook-Token') !== config('services.webhook.token')) {
+            return response()->json(['error'=>'Unauthorized'], 401);
+        }
+
         $request->validate([
             'id' => 'required|integer|exists:pedidos,id',
             'status' => 'required|string|in:pendente,processando,enviado,entregue,cancelado',
